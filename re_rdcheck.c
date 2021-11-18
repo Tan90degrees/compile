@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rdcheck.h"
+
 enum yytokentype
 {
     tok_ID = 256, // 标识符
@@ -55,41 +57,41 @@ int advance()
 
 void myerror()
 {
-    fprintf(stderr, "Panic!!!\n");
+    printf("back!!!\n");
 }
 
-int ConstExp()
-{
-    if (AddExp())
-    {
-        return 1;
-    }
-    myerror();
-    return -1;
-}
+// int ConstExp()
+// {
+//     if (AddExp())
+//     {
+//         return 1;
+//     }
+//     myerror();
+//     return -1;
+// }
 
-int LOrExp()
-{
-    if (LAndExp())
-    {
-        return 1;
-    }
-    if (LOrExp())
-    {
-        if (token == tok_OR)
-        {
-            advance();
-            if (LAndExp())
-            {
-                return 1;
-            }
-        }
-        myerror();
-        return -1;
-    }
-    myerror();
-    return -1;
-}
+// int LOrExp()
+// {
+//     if (LAndExp())
+//     {
+//         return 1;
+//     }
+//     if (LOrExp())
+//     {
+//         if (token == tok_OR)
+//         {
+//             advance();
+//             if (LAndExp())
+//             {
+//                 return 1;
+//             }
+//         }
+//         myerror();
+//         return -1;
+//     }
+//     myerror();
+//     return -1;
+// }
 
 int LAndExp()
 {
@@ -160,28 +162,28 @@ int RelExp()
     return -1;
 }
 
-int AddExp()
-{
-    if (MulExp())
-    {
-        return 1;
-    }
-    if (AddExp())
-    {
-        if (token == tok_ADD || token == tok_SUB)
-        {
-            advance();
-            if (MulExp())
-            {
-                return 1;
-            }
-        }
-        myerror();
-        return -1;
-    }
-    myerror();
-    return -1;
-}
+// int AddExp()
+// {
+//     if (MulExp())
+//     {
+//         return 1;
+//     }
+//     if (AddExp())
+//     {
+//         if (token == tok_ADD || token == tok_SUB)
+//         {
+//             advance();
+//             if (MulExp())
+//             {
+//                 return 1;
+//             }
+//         }
+//         myerror();
+//         return -1;
+//     }
+//     myerror();
+//     return -1;
+// }
 
 int MulExp()
 {
@@ -239,7 +241,7 @@ int FuncRParams()
 
 int UnaryExp()
 {
-    if (PrimaryExp)
+    if (PrimaryExp())
     {
         return 1;
     }
@@ -752,6 +754,7 @@ int ConstExp()
     {
         return 1;
     }
+    myerror();
     return -1;
 }
 
@@ -760,31 +763,35 @@ int ConstDef()
     if (token == tok_ID)
     {
         advance();
-    }
-    while (token == tok_LSQUARE)
-    {
-        advance();
-        if (ConstExp())
+        while (token == tok_LSQUARE)
         {
-            if (token == tok_RSQUARE)
+            advance();
+            if (ConstExp())
             {
-                advance();
-                continue;
+                if (token == tok_RSQUARE)
+                {
+                    advance();
+                    continue;
+                }
+                myerror();
+                return -1;
             }
-            myerror();
-            return -1;
+            else
+            {
+                myerror();
+                return -1;
+            }
         }
-        else
+        if (token == tok_ASSIGN)
         {
-            myerror();
-            return -1;
+            advance();
+            if (ConstInitVal())
+            {
+                return 1;
+            }
         }
-    }
-    if (token == tok_ASSIGN)
-    {
-        advance();
-        ConstInitVal();
-        return 1;
+        myerror();
+        return -1;
     }
     myerror();
     return -1;
@@ -801,24 +808,56 @@ int BType()
     return -1;
 }
 
-int VarDecl()
+// int VarDecl()
+// {
+//     BType();
+//     VarDef();
+//     while (token == tok_COMMA)
+//     {
+//         advance();
+//         VarDef();
+//     }
+//     if (token == tok_SEMICOLON)
+//     {
+//         advance();
+//         CompUnit();
+//         // CompUnit
+//         return 1;
+//     }
+//     else
+//     {
+//         myerror();
+//         return -1;
+//     }
+//     myerror();
+//     return -1;
+// }
+
+int ConstDecl()
 {
-    BType();
-    VarDef();
-    while (token == tok_COMMA)
+    if (token == tok_CONST)
     {
-        advance();
-        VarDef();
-    }
-    if (token == tok_SEMICOLON)
-    {
-        advance();
-        CompUnit();
-        // CompUnit
-        return 1;
-    }
-    else
-    {
+        if (BType())
+        {
+            if (ConstDef())
+            {
+                while (token == tok_COMMA)
+                {
+                    advance();
+                    if (ConstDef())
+                    {
+                        continue;
+                    }
+                    myerror();
+                    return -1;
+                }
+                if (token == tok_SEMICOLON)
+                {
+                    advance();
+                    return 1;
+                }
+            }
+        }
         myerror();
         return -1;
     }
@@ -826,53 +865,29 @@ int VarDecl()
     return -1;
 }
 
-int ConstDecl()
-{
-    if (token == tok_CONST)
-    {
-        BType();
-        ConstDef();
-        while (token == tok_COMMA)
-        {
-            advance();
-            if (ConstDef())
-            {
-                continue;
-            }
-            myerror();
-            return -1;
-        }
-        if (token == tok_SEMICOLON)
-        {
-            advance();
-            CompUnit();
-            // CompUnit
-            return 1;
-        }
-    }
-    myerror();
-    return -1;
-}
-
 int FuncDef()
 {
-    FuncType();
-    if (token == tok_ID)
+    if (FuncType())
     {
-        advance();
-        if (token == tok_LPAR)
+        if (token == tok_ID)
         {
             advance();
-            FuncFParams();
-            if (token == tok_RPAR)
+            if (token == tok_LPAR)
             {
                 advance();
-                if (Block())
+                FuncFParams();
+                if (token == tok_RPAR)
                 {
-                    return -1;
+                    advance();
+                    if (Block())
+                    {
+                        return 1;
+                    }
                 }
             }
         }
+        myerror();
+        return -1;
     }
     myerror();
     return -1;
@@ -890,11 +905,12 @@ int Decl()
 
 int CompUnit()
 {
-    CompUnit();
+    // CompUnit();
     if (Decl() || FuncDef())
     {
         return 1;
     }
+    myerror();
     return -1;
 }
 
@@ -904,5 +920,13 @@ int main(int argc, char **argv)
     {
         advance();
         int r = CompUnit();
+        if (r)
+        {
+            printf("Unit\n");
+        }
+        else
+        {
+            myerror();
+        }
     }
 }
