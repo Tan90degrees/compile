@@ -916,17 +916,26 @@ int CompUnit()
 
 int main(int argc, char **argv)
 {
-    while (1)
+    if (argc > 1)
     {
-        advance();
-        int r = CompUnit();
-        if (r)
+        if (!(yyin = fopen(argv[1], "r")))
         {
-            printf("Unit\n");
-        }
-        else
-        {
-            myerror();
+            perror(argv[1]);
+            return 1;
         }
     }
+    // while (1)
+    // {
+    advance();
+    int r = CompUnit();
+    if (r)
+    {
+        printf("Unit\n");
+    }
+    else
+    {
+        myerror();
+    }
+    // }
+    return 0;
 }
