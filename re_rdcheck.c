@@ -58,39 +58,342 @@ void myerror()
     fprintf(stderr, "Panic!!!\n");
 }
 
-int ConstExp() {}
+int ConstExp()
+{
+    if (AddExp())
+    {
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int LOrExp() {}
+int LOrExp()
+{
+    if (LAndExp())
+    {
+        return 1;
+    }
+    if (LOrExp())
+    {
+        if (token == tok_OR)
+        {
+            advance();
+            if (LAndExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int LAndExp() {}
+int LAndExp()
+{
+    if (EqExp())
+    {
+        return 1;
+    }
+    if (LAndExp())
+    {
+        if (token == tok_AND)
+        {
+            advance();
+            if (EqExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int EqExp() {}
+int EqExp()
+{
+    if (RelExp())
+    {
+        return 1;
+    }
+    if (EqExp())
+    {
+        if (token == tok_EQ || token == tok_NOTEQ)
+        {
+            advance();
+            if (RelExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int RelExp() {}
+int RelExp()
+{
+    if (AddExp())
+    {
+        return 1;
+    }
+    if (RelExp())
+    {
+        if (token == tok_LESS || token == tok_GREAT || token == tok_LESSEQ || token == tok_GREATEQ)
+        {
+            advance();
+            if (AddExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int AddExp() {}
+int AddExp()
+{
+    if (MulExp())
+    {
+        return 1;
+    }
+    if (AddExp())
+    {
+        if (token == tok_ADD || token == tok_SUB)
+        {
+            advance();
+            if (MulExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int MulExp() {}
+int MulExp()
+{
+    if (UnaryExp())
+    {
+        return 1;
+    }
+    if (MulExp())
+    {
+        if (token == tok_MUL || token == tok_DIV || token == tok_MODULO)
+        {
+            advance();
+            if (UnaryExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int UnaryOp() {}
+int UnaryOp()
+{
+    if (token == tok_ADD || token == tok_SUB || token == tok_NOT)
+    {
+        advance();
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int FuncRParams() {}
+int FuncRParams()
+{
+    if (Exp())
+    {
+        while (token == tok_COMMA)
+        {
+            advance();
+            if (Exp())
+            {
+                continue;
+            }
+            myerror();
+            return -1;
+        }
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int UnaryExp() {}
+int UnaryExp()
+{
+    if (PrimaryExp)
+    {
+        return 1;
+    }
+    if (token == tok_ID)
+    {
+        advance();
+        if (token == tok_LPAR)
+        {
+            advance();
+            FuncRParams();
+            if (token == tok_RPAR)
+            {
+                advance();
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int Number() {}
+int Number()
+{
+    if (token == tok_INTEGER)
+    {
+        advance();
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int PrimaryExp() {}
+int PrimaryExp()
+{
+    if (token == tok_LPAR)
+    {
+        advance();
+        if (Exp())
+        {
+            if (token == tok_RPAR)
+            {
+                advance();
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    if (LVal())
+    {
+        return 1;
+    }
+    if (Number())
+    {
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int LOrExp() {}
+int LOrExp()
+{
+    if (LAndExp())
+    {
+        return 1;
+    }
+    if (LOrExp())
+    {
+        if (token == tok_OR)
+        {
+            advance();
+            if (LAndExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int AddExp() {}
+int AddExp()
+{
+    if (MulExp())
+    {
+        return 1;
+    }
+    if (AddExp())
+    {
+        if (token == tok_ADD || token == tok_SUB)
+        {
+            advance();
+            if (MulExp())
+            {
+                return 1;
+            }
+        }
+        myerror();
+        return -1;
+    }
+    myerror();
+    return -1;
+}
 
-int Cond() {}
+int Cond()
+{
+    if (LOrExp())
+    {
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int Exp() {}
+int Exp()
+{
+    if (AddExp())
+    {
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
-int LVal() {}
+int LVal()
+{
+    if (token == tok_ID)
+    {
+        advance();
+        while (token == tok_LSQUARE)
+        {
+            advance();
+            if (Exp)
+            {
+                if (token == tok_RSQUARE)
+                {
+                    advance();
+                    continue;
+                }
+                myerror();
+                return -1;
+            }
+            myerror();
+            return -1;
+        }
+        return 1;
+    }
+    myerror();
+    return -1;
+}
 
 int Stmt()
 {
