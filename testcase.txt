@@ -1,0 +1,104 @@
+const int a = 1;
+const int a = 1, b = 1;
+
+int a;
+int a = 1;
+int a, b;
+int a = 1, b = 1;
+int a, b = 1, c;
+
+int main(){
+    // block
+}
+
+int main(int a){
+    // block
+}
+
+int main(int a, int b){
+    // block
+}
+
+int main(int a, int b[], int c){
+    // block
+}
+
+void main(){
+    // block
+}
+
+void main(int a){
+    // block
+}
+
+void main(int a, int b){
+    // block
+}
+
+void main(int a, int b[], int c){
+    // block
+}
+
+// block
+
+{
+    if ( expr ) {
+        // block
+    }
+}
+
+{
+    if ( expr ) {
+        // block
+    } else {
+        // block
+    }
+}
+
+{
+    if ( expr ) {
+        // block
+    } else if (expr){
+        // block
+    }
+}
+
+{
+    if ( expr ) {
+        // block
+    } else {
+        // block
+    } else if (expr){
+        // block
+    }
+}
+
+{
+    while (expr) {
+        // block
+    }
+}
+
+{
+    break;
+}
+
+{
+    continue;
+}
+
+{
+    return;
+}
+
+{
+    return 0;
+}
+
+{
+    return a;
+}
+
+{
+    return 0, a, 0;
+}
