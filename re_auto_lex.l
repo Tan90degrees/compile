@@ -77,6 +77,8 @@ SEMICOLON   (;)
 
 %%
 
+\/\/.*	{}
+"/*"([^\*]|(\*)*[^\*/])*(\*)*"*/"	{}
 {INTEGER}  {return tok_INTEGER;}
 {INT}  {return tok_INT;}
 {VOID}  {return tok_VOID;}
@@ -115,7 +117,13 @@ SEMICOLON   (;)
 
 %%
 
-int main(){
+int main(int argc,char **argv){
+	  if( argc > 1){
+        if( !(yyin = fopen(argv[1],"r"))){
+            perror(argv[1]);
+            return 1;
+        }
+    }
     int flag = 0;
     while (flag = yylex()){
         switch(flag){
